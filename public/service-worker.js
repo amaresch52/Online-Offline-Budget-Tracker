@@ -1,12 +1,15 @@
 const FILES_TO_CACHE = [
   "/",
   "/index.html",
+  "/index.js",
+  "/styles.css",
   "/icons/icon-192x192.png",
   "/icons/icon-512x512.png",
+  "/db.js",
 ];
 
 const STATIC_CACHE = "static-cache-v1";
-const RUNTIME_CACHE = "runtime-cache";
+const RUNTIME_CACHE = "BudgetDB";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -47,22 +50,6 @@ self.addEventListener("fetch", (event) => {
     !event.request.url.startsWith(self.location.origin)
   ) {
     event.respondWith(fetch(event.request));
-    return;
-  }
-
-  // handle runtime GET requests for data from /api routes
-  if (event.request.url.includes("/api/images")) {
-    // make network request and fallback to cache if network request fails (offline)
-    event.respondWith(
-      caches.open(RUNTIME_CACHE).then((cache) => {
-        return fetch(event.request)
-          .then((response) => {
-            cache.put(event.request, response.clone());
-            return response;
-          })
-          .catch(() => caches.match(event.request));
-      })
-    );
     return;
   }
 
